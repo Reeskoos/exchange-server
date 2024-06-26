@@ -41,7 +41,7 @@ void Handler::handleBuySell(const nlohmann::json& json_req, bool isBuy) {
     std::string price = message["Price"].get<std::string>();
     std::string base_currency = message["BaseCurrency"].get<std::string>();
     std::string quote_currency = message["QuoteCurrency"].get<std::string>();
-
+    
     Side side = isBuy ? Side::BUY : Side::SELL;
     CurrencyPair currency_pair = std::make_pair(base_currency, quote_currency);
 
