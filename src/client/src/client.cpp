@@ -200,3 +200,7 @@ void Client::run() {
   processRegistration();
   menu();
 }
+
+void Client::stop() {
+  io_service_.stop();
+}

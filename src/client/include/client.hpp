@@ -4,10 +4,13 @@
 #include <boost/asio.hpp>
 #include <nlohmann/json.hpp>
 
+#include <gtest/gtest.h> 
+
 class Client {
  public:
   Client(const std::string& host, short port);
   void run();
+  void stop();
 
  private:
   void connect();
@@ -24,6 +27,12 @@ class Client {
   std::string host_;
   short port_;
   std::string client_id_;
+
+  FRIEND_TEST(ClientTest, RegisterClient);
+  FRIEND_TEST(ClientTest, PlaceBuyOrder);
+  FRIEND_TEST(ClientTest, PlaceSellOrder);
+  FRIEND_TEST(ClientTest, CheckClientBalance);
+  FRIEND_TEST(ClientTest, ConnectClient);
 };
 
 #endif  // CLIENTSERVERECN_CLIENT_HPP
