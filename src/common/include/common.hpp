@@ -1,5 +1,5 @@
-#ifndef CLIENSERVERECN_COMMON_HPP
-#define CLIENSERVERECN_COMMON_HPP
+#ifndef CLIENTSERVERECN_COMMON_HPP
+#define CLIENTSERVERECN_COMMON_HPP
 
 #include <string>
 
@@ -14,4 +14,4 @@ const std::string Balance = "Bal";
 
 }  // namespace Requests
 
-#endif  // CLIENSERVERECN_COMMON_HPP
+#endif  // CLIENTSERVERECN_COMMON_HPP

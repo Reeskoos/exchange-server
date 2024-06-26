@@ -1,5 +1,5 @@
-#ifndef CLIENT_HPP
-#define CLIENT_HPP
+#ifndef CLIENTSERVERECN_CLIENT_HPP
+#define CLIENTSERVERECN_CLIENT_HPP
 
 #include <boost/asio.hpp>
 #include <nlohmann/json.hpp>
@@ -26,4 +26,4 @@ class Client {
   std::string client_id_;
 };
 
-#endif  // CLIENT_HPP
+#endif  // CLIENTSERVERECN_CLIENT_HPP
