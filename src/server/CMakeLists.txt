@@ -7,9 +7,22 @@ set(SERVER_SOURCES
     trade/trade.cpp
     trade/order.cpp
     users/peer.cpp
-    main.cpp
 )
 
-add_executable(server ${SERVER_SOURCES})
-target_include_directories(server PRIVATE include)
-target_link_libraries(server PRIVATE Boost::system Boost::multiprecision nlohmann_json::nlohmann_json spdlog::spdlog common)
+add_library(server
+    ${SERVER_SOURCES}
+)
+
+
+target_include_directories(server PUBLIC include)
+
+# Линкуем зависимости для библиотеки server
+target_link_libraries(server PUBLIC Boost::system common nlohmann_json::nlohmann_json spdlog::spdlog)
+
+
+add_executable(server_app main.cpp)
+
+target_include_directories(server_app PUBLIC include)
+
+
+target_link_libraries(server_app server)

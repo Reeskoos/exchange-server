@@ -3,6 +3,24 @@ project(ExchangeServer)
 
 set(CMAKE_CXX_STANDARD 17)
 
+# Install Boost if not found
+find_package(Boost 1.65 REQUIRED COMPONENTS system)
+if (NOT Boost_FOUND)
+    message(STATUS "Boost not found, installing...")
+    execute_process(COMMAND sudo apt-get install -y libboost-all-dev)
+    find_package(Boost REQUIRED COMPONENTS system)
+endif()
+
+# Install GTest if not found
+find_package(GTest REQUIRED)
+if (NOT GTest_FOUND)
+    message(STATUS "GTest not found, installing...")
+    execute_process(COMMAND sudo apt-get install -y libgtest-dev)
+    execute_process(COMMAND sudo cmake -S /usr/src/gtest -B /usr/src/gtest/build)
+    execute_process(COMMAND sudo cmake --build /usr/src/gtest/build --target install)
+    find_package(GTest REQUIRED)
+endif()
+
 # Use vcpkg to manage dependencies if available
 if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
     if(NOT DEFINED ENV{VCPKG_ROOT})
@@ -25,8 +43,9 @@ else()
     message(FATAL_ERROR "VCPKG_ROOT environment variable not set and CMAKE_TOOLCHAIN_FILE not provided")
 endif()
 
-# Find Boost components
-find_package(Boost REQUIRED COMPONENTS system multiprecision)
+# Install other dependencies via vcpkg
+execute_process(COMMAND ${VCPKG_ROOT}/vcpkg install nlohmann-json spdlog)
+
 find_package(nlohmann_json REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 
@@ -34,3 +53,7 @@ find_package(spdlog CONFIG REQUIRED)
 add_subdirectory(src/common)
 add_subdirectory(src/server)
 add_subdirectory(src/client)
+
+# Enable testing
+enable_testing()
+add_subdirectory(src/tests)

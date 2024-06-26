@@ -1,9 +1,11 @@
-# Source files for the client
-set(CLIENT_SOURCES
+add_library(client
     src/client.cpp
-    main.cpp
 )
 
-add_executable(client ${CLIENT_SOURCES})
-target_include_directories(client PRIVATE include)
-target_link_libraries(client PRIVATE Boost::system Boost::multiprecision nlohmann_json::nlohmann_json common)
+target_include_directories(client PUBLIC include)
+target_link_libraries(client PUBLIC Boost::system common nlohmann_json::nlohmann_json spdlog::spdlog)
+
+add_executable(client_app main.cpp)
+
+target_link_libraries(client_app client)
+target_include_directories(client_app PUBLIC include)
