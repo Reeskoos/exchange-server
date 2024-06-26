@@ -16,6 +16,7 @@ using boost::asio::ip::tcp;
 class Server {
  public:
   explicit Server(boost::asio::io_service& io_service);
+  Server(boost::asio::io_service& io_service, short port);
   ~Server();
   void run();
 
