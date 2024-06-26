@@ -9,6 +9,10 @@ Trade::Trade(Core& core, const CurrencyPair& pair)
 void Trade::AddOrder(std::size_t client_id, std::size_t volume,
                      const std::string& price, Side side,
                      const CurrencyPair& pair) {
+  if (!volume || price_t(price) <= 0) {
+    throw std::runtime_error("Invalid order");
+  }
+
   Order order(client_id, volume, price, side, pair);
 
   std::lock_guard<std::mutex> lock(ordersMutex_);
@@ -26,7 +30,7 @@ void Trade::MatchOrders() {
     try {
       Order buyOrder = buyOrders_.top();
       Order sellOrder = sellOrders_.top();
-       
+
       if (buyOrder.getClientId() == sellOrder.getClientId()) {
         break;
       }
