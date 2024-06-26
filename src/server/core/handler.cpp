@@ -16,6 +16,10 @@ void Handler::handleRequest(const std::string& request) {
     handleBuySell(json_req, false);
   } else if (json_req["ReqType"] == Requests::Balance) {
     handleBalance();
+  } else {
+    std::string error = json_req["ReqType"];
+    spdlog::error("Invalid request type: {}", error);
+    async_write_response("[ERROR] Invalid request.");
   }
 }
 
