@@ -26,6 +26,10 @@ void Trade::MatchOrders() {
     try {
       Order buyOrder = buyOrders_.top();
       Order sellOrder = sellOrders_.top();
+       
+      if (buyOrder.getClientId() == sellOrder.getClientId()) {
+        break;
+      }
 
       if (buyOrder.getPrice() >= sellOrder.getPrice()) {
         price_t tradePrice = buyOrder.getPrice();
