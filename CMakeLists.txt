@@ -3,7 +3,7 @@ project(ExchangeServer)
 
 set(CMAKE_CXX_STANDARD 17)
 
-# Automatically download and bootstrap vcpkg if not found
+# Use vcpkg to manage dependencies if available
 if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
     if(NOT DEFINED ENV{VCPKG_ROOT})
         set(VCPKG_ROOT "${CMAKE_BINARY_DIR}/vcpkg")
@@ -25,11 +25,12 @@ else()
     message(FATAL_ERROR "VCPKG_ROOT environment variable not set and CMAKE_TOOLCHAIN_FILE not provided")
 endif()
 
-
-find_package(Boost 1.65 REQUIRED system)
+# Find Boost components
+find_package(Boost REQUIRED COMPONENTS system multiprecision)
 find_package(nlohmann_json REQUIRED)
+find_package(spdlog CONFIG REQUIRED)
 
+# Add subdirectories
 add_subdirectory(src/common)
 add_subdirectory(src/server)
 add_subdirectory(src/client)
-# add_subdirectory(tests)
