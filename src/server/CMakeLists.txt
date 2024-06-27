@@ -1,4 +1,3 @@
-# Source files for the server
 set(SERVER_SOURCES
     core/core.cpp
     core/server.cpp
@@ -16,7 +15,6 @@ add_library(server
 
 target_include_directories(server PUBLIC include)
 
-# Линкуем зависимости для библиотеки server
 target_link_libraries(server PUBLIC Boost::system common nlohmann_json::nlohmann_json spdlog::spdlog)
 
 
