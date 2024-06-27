@@ -37,7 +37,7 @@ TEST_F(ClientTest, RegisterClient) {
     client.sendMessage("0", "Reg", username);
     std::string response = client.readMessage();
     ASSERT_FALSE(response.empty());
-    client.stop(); // Добавлено
+    client.stop(); 
 }
 
 TEST_F(ClientTest, PlaceBuyOrder) {
@@ -50,7 +50,6 @@ TEST_F(ClientTest, PlaceBuyOrder) {
 
     std::string client_id = response;
 
-    // Place a buy order
     json buy_order = {
         {"Volume", "100"},
         {"Price", "50.5"},
@@ -60,7 +59,7 @@ TEST_F(ClientTest, PlaceBuyOrder) {
     client.sendMessage(client_id, "Buy", buy_order.dump());
     std::string buy_response = client.readMessage();
     ASSERT_FALSE(buy_response.empty());
-    client.stop(); // Добавлено
+    client.stop(); 
 }
 
 TEST_F(ClientTest, PlaceSellOrder) {
@@ -73,7 +72,6 @@ TEST_F(ClientTest, PlaceSellOrder) {
 
     std::string client_id = response;
 
-    // Place a sell order
     json sell_order = {
         {"Volume", "100"},
         {"Price", "50.5"},
@@ -83,7 +81,7 @@ TEST_F(ClientTest, PlaceSellOrder) {
     client.sendMessage(client_id, Requests::Sell, sell_order.dump());
     std::string sell_response = client.readMessage();
     ASSERT_FALSE(sell_response.empty());
-    client.stop(); // Добавлено
+    client.stop();
 }
 
 TEST_F(ClientTest, CheckClientBalance) {
@@ -96,7 +94,6 @@ TEST_F(ClientTest, CheckClientBalance) {
 
     std::string client_id = response;
 
-  
     client.sendMessage(client_id, "Bal", "");
     std::string balance_response = client.readMessage();
     ASSERT_FALSE(balance_response.empty());
