@@ -13,8 +13,7 @@ class ServerTest : public ::testing::Test {
   void SetUp() override {
     server = std::make_unique<Server>(io_service, port);
     server_thread = std::make_unique<std::thread>([this]() { server->run(); });
-    std::this_thread::sleep_for(
-        std::chrono::seconds(1));  
+    std::this_thread::sleep_for(std::chrono::seconds(1));
   }
 
   void TearDown() override {

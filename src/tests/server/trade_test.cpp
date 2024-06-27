@@ -123,28 +123,23 @@ TEST_F(TradeTest, MultipleBuyersAndSellers) {
   trade->MatchOrders();
 
   EXPECT_EQ(buyer1->get_balance("USD"), 100);
-  EXPECT_EQ(buyer1->get_balance("RUB"), -7450);  
+  EXPECT_EQ(buyer1->get_balance("RUB"), -7450);
 
-  
   EXPECT_EQ(buyer2->get_balance("USD"), 50);
-  EXPECT_EQ(buyer2->get_balance("RUB"), -3725);  
+  EXPECT_EQ(buyer2->get_balance("RUB"), -3725);
 
-  
   EXPECT_EQ(seller1->get_balance("USD"), -100);
-  EXPECT_EQ(seller1->get_balance("RUB"), 7453);  
-
+  EXPECT_EQ(seller1->get_balance("RUB"), 7453);
 
   EXPECT_EQ(seller2->get_balance("USD"), -50);
-  EXPECT_EQ(seller2->get_balance("RUB"), 3722); 
+  EXPECT_EQ(seller2->get_balance("RUB"), 3722);
 }
 
 TEST_F(TradeTest, PriorityOrderExecution) {
-  
   trade->AddOrder(buyer1->get_id(), 50, "56.54", Side::BUY, {"USD", "RUB"});
   trade->AddOrder(buyer2->get_id(), 50, "56.55", Side::BUY, {"USD", "RUB"});
   trade->AddOrder(buyer3->get_id(), 50, "56.56", Side::BUY, {"USD", "RUB"});
 
-  
   trade->AddOrder(seller1->get_id(), 50, "56.50", Side::SELL, {"USD", "RUB"});
   trade->AddOrder(seller2->get_id(), 50, "56.49", Side::SELL, {"USD", "RUB"});
   trade->AddOrder(seller3->get_id(), 50, "56.48", Side::SELL, {"USD", "RUB"});
@@ -152,19 +147,19 @@ TEST_F(TradeTest, PriorityOrderExecution) {
   trade->MatchOrders();
 
   EXPECT_EQ(buyer1->get_balance("USD"), 50);
-  EXPECT_EQ(buyer1->get_balance("RUB"), -2827);  
+  EXPECT_EQ(buyer1->get_balance("RUB"), -2827);
 
   EXPECT_EQ(buyer2->get_balance("USD"), 50);
-  EXPECT_EQ(buyer2->get_balance("RUB"), -2827.5);  
+  EXPECT_EQ(buyer2->get_balance("RUB"), -2827.5);
 
   EXPECT_EQ(buyer3->get_balance("USD"), 50);
-  EXPECT_EQ(buyer3->get_balance("RUB"), -2828);  
+  EXPECT_EQ(buyer3->get_balance("RUB"), -2828);
 
   EXPECT_EQ(seller1->get_balance("USD"), -50);
-  EXPECT_EQ(seller1->get_balance("RUB"), 2827);  
+  EXPECT_EQ(seller1->get_balance("RUB"), 2827);
 
   EXPECT_EQ(seller2->get_balance("USD"), -50);
-  EXPECT_EQ(seller2->get_balance("RUB"), 2827.5);  
+  EXPECT_EQ(seller2->get_balance("RUB"), 2827.5);
 
   EXPECT_EQ(seller3->get_balance("USD"), -50);
   EXPECT_EQ(seller3->get_balance("RUB"), 2828);
