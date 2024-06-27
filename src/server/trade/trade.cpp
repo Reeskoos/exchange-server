@@ -36,23 +36,25 @@ void Trade::MatchOrders() {
       }
 
       if (buyOrder.getPrice() >= sellOrder.getPrice()) {
-        price_t tradePrice = sellOrder.getTimeStamp() < buyOrder.getTimeStamp()
-                                 ? sellOrder.getPrice()
-                                 : buyOrder.getPrice();
+        price_t tradePrice = sellOrder.getPrice();
+
+        if (sellOrder.getTimeStamp() < buyOrder.getTimeStamp()) {
+          tradePrice = sellOrder.getPrice();
+        } else {
+          tradePrice = buyOrder.getPrice();
+        }
 
         std::size_t tradeVolume =
             std::min(buyOrder.getVolume(), sellOrder.getVolume());
 
-        updateBalances(buyOrder, sellOrder, tradePrice, tradeVolume);
-
         buyOrder.reduceVolume(tradeVolume);
         sellOrder.reduceVolume(tradeVolume);
+        
+        updateBalances(buyOrder, sellOrder, tradePrice, tradeVolume);
 
         buyOrders_.pop();
         sellOrders_.pop();
-
         if (buyOrder.getVolume() != 0) buyOrders_.push(buyOrder);
-
         if (sellOrder.getVolume() != 0) sellOrders_.push(sellOrder);
 
         {
