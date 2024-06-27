@@ -27,7 +27,7 @@ class Session : public std::enable_shared_from_this<Session> {
   tcp::socket socket_;
   Core& core_;
   std::size_t client_id_;
-  std::shared_ptr<Handler> handler_;  
+  std::shared_ptr<Handler> handler_;
   enum { max_length = 1024 };
   char data_[max_length];
 };

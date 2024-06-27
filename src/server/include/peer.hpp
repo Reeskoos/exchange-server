@@ -2,6 +2,7 @@
 #define CLIENTSERVERECN_SERVER_PEER_HPP
 
 #include <boost/asio.hpp>
+
 #include "types.hpp"
 
 using namespace Types;

@@ -19,7 +19,7 @@ class Core {
   using TradePtr = std::unique_ptr<Trade>;
   using Hash = boost::hash<CurrencyPair>;
   using TradesUnorderedMap = std::unordered_map<CurrencyPair, TradePtr, Hash>;
-  
+
   using PeerUnorderedMap =
       std::unordered_map<std::size_t, std::shared_ptr<Peer>>;
 
