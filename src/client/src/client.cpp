@@ -145,21 +145,109 @@ void Client::displayBalance(const std::string& balance_response) {
   }
 }
 
+void Client::viewActiveOrders() {
+  try {
+    auto [base_currency, quote_currency] = inputCurrencyPair();
+    json message{{"BaseCurrency", base_currency},
+                 {"QuoteCurrency", quote_currency}};
+    sendMessage(client_id_, Requests::ActiveOrders, message.dump());
+    std::string response = readMessage();
+    displayOrders(response, "Active Orders");
+  } catch (...) {
+    std::cerr << "Failed to retrieve active orders. Please try again later."
+              << std::endl;
+  }
+}
+
+void Client::viewCompletedTrades() {
+  try {
+    auto [base_currency, quote_currency] = inputCurrencyPair();
+    json message{{"BaseCurrency", base_currency},
+                 {"QuoteCurrency", quote_currency}};
+    sendMessage(client_id_, Requests::CompletedTrades, message.dump());
+    std::string response = readMessage();
+    displayOrders(response, "Completed Trades");
+  } catch (...) {
+    std::cerr << "Failed to retrieve completed trades. Please try again later."
+              << std::endl;
+  }
+}
+
+void Client::displayOrders(const std::string& orders_response,
+                           const std::string& title) {
+  try {
+    auto orders = json::parse(orders_response);
+    if (orders.empty()) {
+      if (title == "Active Orders") {
+        std::cout << "There's no active orders." << std::endl;
+      } else if (title == "Completed Trades") {
+        std::cout << "There's no completed trades." << std::endl;
+      }
+      return;
+    }
+
+    std::cout << title << ":" << std::endl;
+    for (const auto& order : orders) {
+      std::string currency_pair;
+
+      if (order["currency_pair"].is_array()) {
+        currency_pair = order["currency_pair"][0].get<std::string>() + "/" +
+                        order["currency_pair"][1].get<std::string>();
+      } else {
+        currency_pair = order["currency_pair"];
+      }
+
+      std::cout << " - Volume: " << order["volume"]
+                << ", Price: " << order["price"] << ", " << order["side"]
+                << ", " << currency_pair << "." << std::endl;
+    }
+    std::cout << std::endl;
+  } catch (...) {
+    std::cerr << "Failed to parse orders response." << std::endl;
+  }
+}
+
+std::pair<std::string, std::string> Client::inputCurrencyPair() {
+  int currency_option = 0;
+  std::cout << "Choose currency pair:\n"
+               "1) USD/RUB\n"
+               "2) RUB/USD\n";
+
+  while (true) {
+    std::cin >> currency_option;
+    if (std::cin.fail() || (currency_option != 1 && currency_option != 2)) {
+      std::cout << "Invalid option. Choose 1 or 2: ";
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    } else {
+      break;
+    }
+  }
+
+  if (currency_option == 1) {
+    return {"USD", "RUB"};
+  } else {
+    return {"RUB", "USD"};
+  }
+}
+
 void Client::menu() {
   while (true) {
     std::cout << "Menu:\n"
                  "1) Balance\n"
-                 "2) Buy\n"
-                 "3) Sell\n"
-                 "4) Exit\n"
+                 "2) Place Buy Order\n"
+                 "3) Place Sell Order\n"
+                 "4) View Active Orders\n"
+                 "5) View Completed Trades\n"
+                 "6) Exit\n"
               << std::endl;
 
     int menu_option_num = 0;
     std::cout << "Choose an option: ";
     while (true) {
       std::cin >> menu_option_num;
-      if (std::cin.fail() || (menu_option_num < 1 || menu_option_num > 4)) {
-        std::cout << "Invalid option. Choose 1, 2, 3, or 4: ";
+      if (std::cin.fail() || (menu_option_num < 1 || menu_option_num > 6)) {
+        std::cout << "Invalid option. Choose 1, 2, 3, 4, 5, or 6: ";
         std::cin.clear();
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
       } else {
@@ -183,6 +271,14 @@ void Client::menu() {
         break;
       }
       case 4: {
+        viewActiveOrders();
+        break;
+      }
+      case 5: {
+        viewCompletedTrades();
+        break;
+      }
+      case 6: {
         std::cout << "Exiting..." << std::endl;
         socket_.close();
         exit(0);
@@ -201,6 +297,4 @@ void Client::run() {
   menu();
 }
 
-void Client::stop() {
-  io_service_.stop();
-}
+void Client::stop() { io_service_.stop(); }

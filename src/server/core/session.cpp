@@ -1,5 +1,6 @@
 #include <boost/bind/bind.hpp>
 #include <nlohmann/json.hpp>
+
 #include "session.hpp"
 #include "spdlog/spdlog.h"
 
@@ -11,9 +12,7 @@ Session::Session(boost::asio::io_service& io_service, Core& core)
 
 tcp::socket& Session::socket() { return socket_; }
 
-void Session::start() {
-  do_read();
-}
+void Session::start() { do_read(); }
 
 void Session::do_read() {
   auto self(shared_from_this());
@@ -46,8 +45,7 @@ void Session::async_write(const std::string& response) {
   auto self(shared_from_this());
   boost::asio::async_write(
       socket_, boost::asio::buffer(response + "\0", response.size() + 1),
-      [this, self](boost::system::error_code ec,
-                   std::size_t /*length*/) {
+      [this, self](boost::system::error_code ec, std::size_t /*length*/) {
         if (ec) {
           spdlog::error("Error writing to socket: {}", ec.message());
           core_.RemovePeer(client_id_);

@@ -20,6 +20,9 @@ class Handler : public std::enable_shared_from_this<Handler> {
   void handleRegistration(const json& json_req);
   void handleBuySell(const json& json_req, bool isBuy);
   void handleBalance();
+  void handleActiveOrders(const json& json_req);
+  void handleCompletedTrades(const json& json_req);
+
   void async_write_response(const std::string& response);
 
   Core& core_;

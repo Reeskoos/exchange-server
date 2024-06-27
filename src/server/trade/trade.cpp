@@ -52,6 +52,15 @@ void Trade::MatchOrders() {
 
         if (sellOrder.getVolume() != 0) sellOrders_.push(sellOrder);
 
+        {
+          std::lock_guard<std::mutex> tradesLock(completedTradesMutex_);
+          completedTrades_.emplace_back(tradeVolume, tradePrice.str(),
+                                        currencyPair_, buyOrder.getSide());
+        }
+
+        logMatchedTrade(buyOrder.getClientId(), sellOrder.getClientId(),
+                        tradeVolume, tradePrice);
+
       } else {
         break;
       }
@@ -82,4 +91,42 @@ void Trade::updateBalances(const Order& buyOrder, const Order& sellOrder,
   }
 }
 
+void Trade::logMatchedTrade(std::size_t buyerID, std::size_t sellerID,
+                            std::size_t volume, price_t& price) {
+  json trade_log = {
+      {"buyer_id", buyerID},
+      {"seller_id", sellerID},
+      {"volume", volume},
+      {"price", price.str()},
+      {"currency_pair",
+       {{"base", currencyPair_.first}, {"qouted", currencyPair_.second}}},
+  };
+
+  spdlog::info("Trade matched: {}", trade_log.dump());
+}
+
 CurrencyPair Trade::getCurrencyPair() const { return currencyPair_; }
+
+std::vector<OrderData> Trade::getAllActiveOrders() {
+  std::vector<OrderData> allActiveOrders;
+  std::lock_guard<std::mutex> lock(ordersMutex_);
+
+  auto copyBuyOrders = buyOrders_;
+  while (!copyBuyOrders.empty()) {
+    allActiveOrders.push_back(copyBuyOrders.top().getData());
+    copyBuyOrders.pop();
+  }
+
+  auto copySellOrders = sellOrders_;
+  while (!copySellOrders.empty()) {
+    allActiveOrders.push_back(copySellOrders.top().getData());
+    copySellOrders.pop();
+  }
+
+  return allActiveOrders;
+}
+
+std::vector<TradeData> Trade::getAllCompletedTrades() {
+  std::lock_guard<std::mutex> lock(completedTradesMutex_);
+  return completedTrades_;
+}
