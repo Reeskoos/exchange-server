@@ -68,8 +68,7 @@ void Client::processRegistration() {
 void Client::placeOrder(bool isBuy) {
   std::string volume, price, base_currency, quote_currency;
 
-  std::regex number_pattern(
-      "^[1-9]\\d*$");  // Pattern for positive integers without leading zeros
+  std::regex number_pattern("^[1-9]\\d*$");
 
   std::cout << "Enter volume: ";
   while (true) {
