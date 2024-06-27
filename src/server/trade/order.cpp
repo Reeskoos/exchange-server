@@ -1,6 +1,5 @@
 #include "order.hpp"
 
-
 bool OrderData::operator>(const OrderData& other) const {
   return (price_ > other.price_) ||
          (price_ == other.price_ && timestamp_ < other.timestamp_);
@@ -19,7 +18,12 @@ bool Order::operator>(const Order& other) const { return data_ > other.data_; }
 
 bool Order::operator<(const Order& other) const { return data_ < other.data_; }
 
-void Order::reduceVolume(std::size_t value) { data_.volume_ -= value; }
+void Order::reduceVolume(std::size_t value) {
+  if (value > data_.volume_) {
+    throw std::logic_error("Reduce volume error");
+  }
+  data_.volume_ -= value;
+}
 
 OrderData Order::getData() const { return data_; }
 
