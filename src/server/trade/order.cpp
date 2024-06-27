@@ -1,28 +1,23 @@
 #include "order.hpp"
 
+
 bool OrderData::operator>(const OrderData& other) const {
-  if (side_ == Side::BUY) {
-    return (price_ < other.price_) ||
-           (price_ == other.price_ && timestamp_ > other.timestamp_);
-  } else {
-    return (price_ > other.price_) ||
-           (price_ == other.price_ && timestamp_ > other.timestamp_);
-  }
+  return (price_ > other.price_) ||
+         (price_ == other.price_ && timestamp_ < other.timestamp_);
 }
 
 bool OrderData::operator<(const OrderData& other) const {
-  if (side_ == Side::BUY) {
-    return (price_ > other.price_) ||
-           (price_ == other.price_ && timestamp_ < other.timestamp_);
-  } else {
-    return (price_ < other.price_) ||
-           (price_ == other.price_ && timestamp_ < other.timestamp_);
-  }
+  return (price_ < other.price_) ||
+         (price_ == other.price_ && timestamp_ < other.timestamp_);
 }
 
 Order::Order(std::size_t client_id, std::size_t volume,
              const std::string& price, Side side, const CurrencyPair& pair)
     : data_(client_id, volume, price, side, pair) {}
+
+bool Order::operator>(const Order& other) const { return data_ > other.data_; }
+
+bool Order::operator<(const Order& other) const { return data_ < other.data_; }
 
 void Order::reduceVolume(std::size_t value) { data_.volume_ -= value; }
 
@@ -39,7 +34,3 @@ Side Order::getSide() const { return data_.side_; }
 CurrencyPair Order::getCurrencyPair() const { return data_.currency_pair_; }
 
 time_point Order::getTimeStamp() const { return data_.timestamp_; }
-
-bool Order::operator>(const Order& other) const { return data_ > other.data_; }
-
-bool Order::operator<(const Order& other) const { return data_ < other.data_; }

@@ -36,7 +36,10 @@ void Trade::MatchOrders() {
       }
 
       if (buyOrder.getPrice() >= sellOrder.getPrice()) {
-        price_t tradePrice = buyOrder.getPrice();
+        price_t tradePrice = sellOrder.getTimeStamp() < buyOrder.getTimeStamp()
+                                 ? sellOrder.getPrice()
+                                 : buyOrder.getPrice();
+
         std::size_t tradeVolume =
             std::min(buyOrder.getVolume(), sellOrder.getVolume());
 
@@ -93,16 +96,12 @@ void Trade::updateBalances(const Order& buyOrder, const Order& sellOrder,
 
 void Trade::logMatchedTrade(std::size_t buyerID, std::size_t sellerID,
                             std::size_t volume, price_t& price) {
-  json trade_log = {
-      {"buyer_id", buyerID},
-      {"seller_id", sellerID},
-      {"volume", volume},
-      {"price", price.str()},
-      {"currency_pair",
-       {{"base", currencyPair_.first}, {"qouted", currencyPair_.second}}},
-  };
+  std::string trade_log = fmt::format(
+      "buyer_id: {}, seller_id: {}, volume: {}, price: {}, pair: {}/{}",
+      buyerID, sellerID, volume, price.str(), currencyPair_.first,
+      currencyPair_.second);
 
-  spdlog::info("Trade matched: {}", trade_log.dump());
+  spdlog::info("Trade matched: {}", trade_log);
 }
 
 CurrencyPair Trade::getCurrencyPair() const { return currencyPair_; }

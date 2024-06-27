@@ -33,9 +33,9 @@ struct TradeData {
 class Trade {
  public:
   using BuyOrderQueue =
-      std::priority_queue<Order, std::vector<Order>, std::less<>>;
+      std::priority_queue<Order, std::vector<Order>, std::less<Order>>;
   using SellOrderQueue =
-      std::priority_queue<Order, std::vector<Order>, std::greater<>>;
+      std::priority_queue<Order, std::vector<Order>, std::greater<Order>>;
 
   Trade(Core& core, const CurrencyPair& pair);
   ~Trade() = default;
