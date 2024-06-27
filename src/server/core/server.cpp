@@ -5,21 +5,18 @@
 #include "session.hpp"
 #include "spdlog/spdlog.h"
 
-
-
 Server::Server(boost::asio::io_service& io_service)
     : Server(io_service, port) {}
 
-Server::Server(boost::asio::io_service& io_service, short port) 
+Server::Server(boost::asio::io_service& io_service, short port)
     : io_service_(io_service),
       acceptor_(io_service, tcp::endpoint(tcp::v4(), port)),
-      timer_(io_service), 
+      timer_(io_service),
       running_(true) {
   spdlog::info("Server started! Listening on port {}", port);
   do_accept();
   start_match_orders();
 }
-
 
 Server::~Server() {
   running_ = false;
@@ -41,7 +38,8 @@ void Server::do_accept() {
 void Server::handle_accept(std::shared_ptr<Session> new_session,
                            const boost::system::error_code& error) {
   if (!error) {
-    spdlog::info("Accepted new session: user_id: {}", new_session->getClientID());
+    spdlog::info("Accepted new session: user_id: {}",
+                 new_session->getClientID());
     try {
       new_session->start();
     } catch (const std::exception& e) {
@@ -69,7 +67,7 @@ void Server::match_orders_periodically(const boost::system::error_code& error) {
     } catch (const std::exception& e) {
       spdlog::error("Exception in matching orders: {}", e.what());
     }
-    start_match_orders(); 
+    start_match_orders();
   } else if (error != boost::asio::error::operation_aborted) {
     spdlog::error("Timer error: {}", error.message());
   }

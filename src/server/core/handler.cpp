@@ -16,6 +16,10 @@ void Handler::handleRequest(const std::string& request) {
     handleBuySell(json_req, false);
   } else if (json_req["ReqType"] == Requests::Balance) {
     handleBalance();
+  } else if (json_req["ReqType"] == Requests::ActiveOrders) {
+    handleActiveOrders(json_req);
+  } else if (json_req["ReqType"] == Requests::CompletedTrades) {
+    handleCompletedTrades(json_req);
   } else {
     std::string error = json_req["ReqType"];
     spdlog::error("Invalid request type: {}", error);
@@ -23,7 +27,7 @@ void Handler::handleRequest(const std::string& request) {
   }
 }
 
-void Handler::handleRegistration(const nlohmann::json& json_req) {
+void Handler::handleRegistration(const json& json_req) {
   try {
     std::string user_name = json_req["Message"];
     client_id_ = core_.RegisterNewUser(user_name);
@@ -38,14 +42,15 @@ void Handler::handleRegistration(const nlohmann::json& json_req) {
   }
 }
 
-void Handler::handleBuySell(const nlohmann::json& json_req, bool isBuy) {
+void Handler::handleBuySell(const json& json_req, bool isBuy) {
   try {
     auto message = json::parse(json_req["Message"].get<std::string>());
     std::size_t volume = std::stoul(message["Volume"].get<std::string>());
     std::string price = message["Price"].get<std::string>();
+
     std::string base_currency = message["BaseCurrency"].get<std::string>();
     std::string quote_currency = message["QuoteCurrency"].get<std::string>();
-    
+
     Side side = isBuy ? Side::BUY : Side::SELL;
     CurrencyPair currency_pair = std::make_pair(base_currency, quote_currency);
 
@@ -66,6 +71,59 @@ void Handler::handleBalance() {
     async_write_response(response);
   } catch (const std::exception& e) {
     spdlog::error("Exception in handleBalance: {}", e.what());
+    async_write_response("[ERROR] Internal server error.");
+  }
+}
+
+void Handler::handleActiveOrders(const json& json_req) {
+  try {
+    auto message = json::parse(json_req["Message"].get<std::string>());
+    std::string base_currency = message["BaseCurrency"].get<std::string>();
+    std::string quote_currency = message["QuoteCurrency"].get<std::string>();
+
+    CurrencyPair currency_pair = std::make_pair(base_currency, quote_currency);
+    auto activeOrders =
+        core_.getTradeModule(currency_pair).getAllActiveOrders();
+    auto activeOrdersJson = json::array();
+    for (const auto& order : activeOrders) {
+      if (order.client_id_ != client_id_) {
+        activeOrdersJson.push_back(
+            {{"volume", order.volume_},
+             {"price", order.price_.str()},
+             {"side", order.side_ == Side::BUY ? "BUY" : "SELL"},
+             {"currency_pair",
+              order.currency_pair_.first + "/" + order.currency_pair_.second}});
+      }
+    }
+    std::string response = activeOrdersJson.dump();
+    async_write_response(response);
+  } catch (const std::exception& e) {
+    spdlog::error("Exception in handleActiveOrders: {}", e.what());
+    async_write_response("[ERROR] Internal server error.");
+  }
+}
+
+void Handler::handleCompletedTrades(const json& json_req) {
+  try {
+    auto message = json::parse(json_req["Message"].get<std::string>());
+    std::string base_currency = message["BaseCurrency"].get<std::string>();
+    std::string quote_currency = message["QuoteCurrency"].get<std::string>();
+
+    CurrencyPair currency_pair = std::make_pair(base_currency, quote_currency);
+    auto completedTrades =
+        core_.getTradeModule(currency_pair).getAllCompletedTrades();
+    auto completedTradesJson = json::array();
+    for (const auto& trade : completedTrades) {
+      completedTradesJson.push_back(
+          {{"volume", trade.volume},
+           {"price", trade.price},
+           {"currency_pair", trade.currency_pair},
+           {"side", trade.side == Side::BUY ? "BUY" : "SELL"}});
+    }
+    std::string response = completedTradesJson.dump();
+    async_write_response(response);
+  } catch (const std::exception& e) {
+    spdlog::error("Exception in handleCompletedTrades: {}", e.what());
     async_write_response("[ERROR] Internal server error.");
   }
 }

@@ -1,10 +1,10 @@
 #ifndef CLIENTSERVERECN_CLIENT_HPP
 #define CLIENTSERVERECN_CLIENT_HPP
 
+#include <gtest/gtest.h>
+
 #include <boost/asio.hpp>
 #include <nlohmann/json.hpp>
-
-#include <gtest/gtest.h> 
 
 class Client {
  public:
@@ -13,14 +13,23 @@ class Client {
   void stop();
 
  private:
+  void menu();
   void connect();
+
+  std::string readMessage();
   void sendMessage(const std::string& id, const std::string& requestType,
                    const std::string& message);
-  std::string readMessage();
+
   void processRegistration();
-  void menu();
-  void placeOrder(bool isBuy);
+
   void displayBalance(const std::string& balance_response);
+  void viewActiveOrders();
+  void viewCompletedTrades();
+  void placeOrder(bool isBuy);
+  void displayOrders(const std::string& orders_response,
+                     const std::string& title);
+
+  std::pair<std::string, std::string> inputCurrencyPair();
 
   boost::asio::io_service io_service_;
   boost::asio::ip::tcp::socket socket_;

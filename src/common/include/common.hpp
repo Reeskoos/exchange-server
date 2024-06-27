@@ -11,6 +11,8 @@ const std::string Hello = "Hel";
 const std::string Buy = "Buy";
 const std::string Sell = "Sel";
 const std::string Balance = "Bal";
+const std::string ActiveOrders = "Ord";
+const std::string CompletedTrades = "Trd";
 
 }  // namespace Requests
 
