@@ -110,15 +110,19 @@ CurrencyPair Trade::getCurrencyPair() const { return currencyPair_; }
 
 std::vector<OrderData> Trade::getAllActiveOrders() {
   std::vector<OrderData> allActiveOrders;
-  std::lock_guard<std::mutex> lock(ordersMutex_);
+    
+  {
+    std::lock_guard<std::mutex> lock(ordersMutex_);
 
-  auto copyBuyOrders = buyOrders_;
+    auto copyBuyOrders = buyOrders_;
+    auto copySellOrders = sellOrders_;
+  }
+
   while (!copyBuyOrders.empty()) {
     allActiveOrders.push_back(copyBuyOrders.top().getData());
     copyBuyOrders.pop();
   }
 
-  auto copySellOrders = sellOrders_;
   while (!copySellOrders.empty()) {
     allActiveOrders.push_back(copySellOrders.top().getData());
     copySellOrders.pop();
